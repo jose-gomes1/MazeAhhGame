@@ -11,7 +11,7 @@ from raycast import render
 from ui import overlay, game_over_screen, win_screen
 
 pygame.init()
-pygame.display.set_caption("Maze Horror")
+pygame.display.set_caption("Maze Game")
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
