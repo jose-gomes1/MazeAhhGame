@@ -2,7 +2,7 @@ import pygame
 import math
 from settings import *
 
-def render(screen, player, maze, monster):
+def render(screen, player, maze, monsters):
     width = screen.get_width()
     height = screen.get_height()
     ray_angle = player.angle - FOV / 2
@@ -67,8 +67,9 @@ def render(screen, player, maze, monster):
                 )
 
     # ---------- EXIT ----------
-    ex, ey = maze.exit
-    draw_sprite(ex + 0.5, ey + 0.5, (0, 0, 0))
+    if maze.exit:
+        ex, ey = maze.exit
+        draw_sprite(ex + 0.5, ey + 0.5, (0, 0, 0))
 
     # ---------- FAKE EXITS ----------
     for fx, fy in maze.fake_exits:
@@ -79,13 +80,14 @@ def render(screen, player, maze, monster):
         cx, cy = maze.compass_pos
         draw_sprite(cx, cy, (70, 70, 70))  # dark gray
 
-    # ---------- MONSTER ----------
-    draw_sprite(
-        monster.x,
-        monster.y,
-        {
-            "red": (255, 0, 0),
-            "blue": (0, 0, 255),
-            "green": (0, 255, 0)
-        }[monster.color]
-    )
+    # ---------- MONSTERS ----------
+    for monster in monsters:
+        draw_sprite(
+            monster.x,
+            monster.y,
+            {
+                "red": (255, 0, 0),
+                "blue": (0, 0, 255),
+                "green": (0, 255, 0)
+            }[monster.color]
+        )

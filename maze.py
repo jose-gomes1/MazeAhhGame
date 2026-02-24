@@ -6,12 +6,12 @@ class Maze:
         with open(level_path, "r") as f:
             data = json.load(f)
 
-        self.map = data["map"]
+        self.map = [list(row) for row in data["map"]]
         self.height = len(self.map)
         self.width = len(self.map[0])
 
         self.player_start = None
-        self.monster_start = None
+        self.monsters_info = []  # list of (color, position)
         self.exit = None
         self.fake_exits = []
         self.compass_pos = None
@@ -20,16 +20,22 @@ class Maze:
         for y, row in enumerate(self.map):
             for x, cell in enumerate(row):
                 pos = (x + 0.5, y + 0.5)
+
                 if cell == "P":
                     self.player_start = pos
-                elif cell == "M":
-                    self.monster_start = pos
+                elif cell in ("R", "B", "G"):
+                    color = {"R": "red", "B": "blue", "G": "green"}[cell]
+                    self.monsters_info.append((color, pos))
+                    self.map[y][x] = "."  # clear tile
                 elif cell == "E":
                     self.exit = (x, y)
                 elif cell == "F":
                     self.fake_exits.append((x, y))
                 elif cell == "C":
                     self.compass_pos = pos
+
+        # convert map back to strings
+        self.map = ["".join(row) for row in self.map]
 
     def is_wall(self, x, y):
         xi, yi = int(x), int(y)
@@ -38,7 +44,7 @@ class Maze:
         return self.map[yi][xi] == "#"
 
     def reached_real_exit(self, x, y):
-        return int(x) == self.exit[0] and int(y) == self.exit[1]
+        return self.exit and int(x) == self.exit[0] and int(y) == self.exit[1]
 
     def reached_fake_exit(self, x, y):
         return (int(x), int(y)) in self.fake_exits
@@ -49,7 +55,7 @@ class Maze:
                 self.compass_taken = True
 
     def compass_angle(self, px, py):
-        if not self.compass_taken:
+        if not self.compass_taken or not self.exit:
             return None
         dx = self.exit[0] + 0.5 - px
         dy = self.exit[1] + 0.5 - py
